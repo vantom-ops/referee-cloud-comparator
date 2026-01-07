@@ -1,25 +1,23 @@
 from fpdf import FPDF
-
+import io
 
 def export_pdf(df, winner):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, "Cloud Referee Decision Report\n\n")
 
-    pdf.cell(0, 10, "Cloud Referee – Decision Report", ln=True)
+    for i, row in df.iterrows():
+        pdf.multi_cell(0, 10, f"Service: {row['Service']}")
+        pdf.multi_cell(0, 10, f"Score: {row['Score']}")
+        pdf.multi_cell(0, 10, f"Pros: {row['Pros']}")
+        pdf.multi_cell(0, 10, f"Cons: {row['Cons']}")
+        pdf.multi_cell(0, 10, "\n")
 
-    for _, row in df.iterrows():
-        pdf.ln(5)
-        pdf.multi_cell(
-            0,
-            8,
-            f"Service: {row['Service']}\n"
-            f"Score: {row['Score']}\n"
-            f"Pros: {row['Pros']}\n"
-            f"Cons: {row['Cons']}\n"
-        )
+    pdf.multi_cell(0, 10, f"Recommended: {winner['Service']}")
 
-    pdf.ln(5)
-    pdf.cell(0, 10, f"Recommended Choice: {winner['Service']}", ln=True)
-
-    pdf.output("decision_report.pdf")
+    # Save PDF to bytes and return
+    pdf_buffer = io.BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
+    return pdf_buffer.read()
