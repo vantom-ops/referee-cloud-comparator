@@ -1,5 +1,4 @@
 from fpdf import FPDF
-import io
 
 def export_pdf(df, winner):
     pdf = FPDF()
@@ -16,8 +15,6 @@ def export_pdf(df, winner):
 
     pdf.multi_cell(0, 10, f"Recommended: {winner['Service']}")
 
-    # Save PDF to bytes and return
-    pdf_buffer = io.BytesIO()
-    pdf.output(pdf_buffer)
-    pdf_buffer.seek(0)
-    return pdf_buffer.read()
+    # Return PDF as bytes
+    pdf_bytes = pdf.output(dest='S').encode('latin1')  # << fixed here
+    return pdf_bytes
